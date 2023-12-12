@@ -4,7 +4,7 @@
  * @Autor: liushuhao
  * @Date: 2023-11-19 20:51:23
  * @LastEditors: liushuhao
- * @LastEditTime: 2023-12-11 10:50:39
+ * @LastEditTime: 2023-12-12 22:04:27
  */
 import {useLocalStore} from 'mobx-react';
 import {observer} from 'mobx-react';
@@ -18,6 +18,12 @@ import {
   Image,
 } from 'react-native';
 import HomeStore from '../../stores/HomeStore';
+import icon_heart from '../../assets/icon_heart.png';
+import icon_heart_empty from '../../assets/icon_heart_empty.png';
+import FlowList from '../../components/flowlist/FlowList.js';
+import ResizeImage from '../../components/ResizeImage';
+import Heart from './components/Heart';
+
 
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
 
@@ -29,23 +35,24 @@ export default observer(() => {
     store.requestHomeList();
   };
 
+  const onValueChanged = (value: boolean, item : any) => {
+    console.log("🚀 ~ file: index.tsx:39 ~ onValueChanged ~ item:", item)
+    console.log('输出value', value);
+  };
+
   const renderList = ({item, index}: any) => {
+    console.log("🚀 ~ file: index.tsx:44 ~ renderList ~ item:", item)
     console.log('输出item.avatarUrl', item);
+    console.log("🚀 ~ file: index.tsx:46 ~ renderList ~ item:", item)
     console.log('输出index', index);
     return (
       <View style={styles.item}>
-        <Image
-          style={{
-            width: (SCREEN_WIDTH - 18) >> 1,
-            height: 200,
-            resizeMode: 'cover',
-          }}
-          source={{uri: item.image}}
-        />
+        <ResizeImage uri={item.image}></ResizeImage>
         <Text style={styles.titleTxt}>{item.title}</Text>
         <View style={styles.nameLayout}>
           <Image style={styles.avatarImg} source={{uri: item.avatarUrl}} />
           <Text style={styles.nameTxt}>{item.userName}</Text>
+          <Heart value={item.isFavorite} onValueChanged={(value) => onValueChanged(value, item)}></Heart>
           <Text style={styles.countTxt}>{item.favoriteCount}</Text>
         </View>
       </View>
@@ -62,7 +69,7 @@ export default observer(() => {
   }, []);
   return (
     <View style={styles.root}>
-      <FlatList
+      <FlowList
         contentContainerStyle={styles.container}
         onEndReached={handleEndReached}
         onEndReachedThreshold={0.01}
