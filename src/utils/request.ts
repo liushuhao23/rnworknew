@@ -4,14 +4,13 @@
  * @Autor: liushuhao
  * @Date: 2023-11-18 21:01:54
  * @LastEditors: liushuhao
- * @LastEditTime: 2023-12-12 21:12:45
+ * @LastEditTime: 2023-12-15 15:17:51
  */
 import axios, {AxiosResponse} from 'axios';
 import Apis from '../api/Apis';
 
-// http://10.80.12.10:7001 // mac
-// http://192.168.0.106:7001 // window
-const baseURL = 'http://192.168.0.106:7001'
+// const baseURL = 'http://192.168.0.106:7001'; // window
+const baseURL = 'http://10.80.12.10:7001';// mac 
 const instance = axios.create({
   baseURL: baseURL,
   timeout: 10 * 1000,

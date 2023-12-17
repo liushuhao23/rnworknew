@@ -4,7 +4,7 @@
  * @Autor: liushuhao
  * @Date: 2023-11-19 20:51:23
  * @LastEditors: liushuhao
- * @LastEditTime: 2023-12-12 22:04:27
+ * @LastEditTime: 2023-12-15 16:45:48
  */
 import {useLocalStore} from 'mobx-react';
 import {observer} from 'mobx-react';
@@ -23,6 +23,8 @@ import icon_heart_empty from '../../assets/icon_heart_empty.png';
 import FlowList from '../../components/flowlist/FlowList.js';
 import ResizeImage from '../../components/ResizeImage';
 import Heart from './components/Heart';
+import CategoryList from './components/CategoryList';
+import TitleBar from './components/TitleBar';
 
 
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
@@ -59,6 +61,12 @@ export default observer(() => {
     );
   };
 
+  const FootCOmponent = () => {
+    return (
+      <Text style={styles.footerTxt}>没有更多数据了</Text>
+    )
+  }
+
   const handleEndReached = () => {
     store.requestHomeList();
     console.log('输出');
@@ -66,9 +74,15 @@ export default observer(() => {
 
   useEffect(() => {
     store.requestHomeList();
+    store.getCategoryList();
   }, []);
+  const categoryList = store.categoryList.filter(i => i.isAdd);
   return (
     <View style={styles.root}>
+      <TitleBar                 tab={1}
+                onTabChanged={(tab: number) => {
+                    console.log(`tab=${tab}`)
+                }}></TitleBar>
       <FlowList
         contentContainerStyle={styles.container}
         onEndReached={handleEndReached}
@@ -80,6 +94,16 @@ export default observer(() => {
         data={store.homeList}
         renderItem={renderList}
         numColumns={2}
+        ListFooterComponent={FootCOmponent}
+        ListHeaderComponent={
+          <CategoryList
+              categoryList={categoryList}
+              allCategoryList={store.categoryList}
+              onCategoryChange={(category: Category) => {
+                  console.log(JSON.stringify(category));
+              }}
+          />
+      }
       />
     </View>
   );
