@@ -4,30 +4,25 @@
  * @Autor: liushuhao
  * @Date: 2023-11-19 20:51:23
  * @LastEditors: liushuhao
- * @LastEditTime: 2023-12-15 16:45:48
+ * @LastEditTime: 2023-12-17 20:55:48
  */
-import {useLocalStore} from 'mobx-react';
-import {observer} from 'mobx-react';
-import React, {useEffect} from 'react';
-import {
-  View,
-  Text,
-  FlatList,
-  StyleSheet,
-  Dimensions,
-  Image,
-} from 'react-native';
-import HomeStore from '../../stores/HomeStore';
-import icon_heart from '../../assets/icon_heart.png';
-import icon_heart_empty from '../../assets/icon_heart_empty.png';
-import FlowList from '../../components/flowlist/FlowList.js';
-import ResizeImage from '../../components/ResizeImage';
-import Heart from './components/Heart';
-import CategoryList from './components/CategoryList';
-import TitleBar from './components/TitleBar';
+import {useLocalStore} from "mobx-react";
+import {observer} from "mobx-react";
+import React, {useEffect} from "react";
+import {View, Text, FlatList, StyleSheet, Dimensions, Image} from "react-native";
+import HomeStore from "../../stores/HomeStore";
+import icon_heart from "../../assets/icon_heart.png";
+import icon_heart_empty from "../../assets/icon_heart_empty.png";
+import FlowList from "../../components/flowlist/FlowList.js";
+import ResizeImage from "../../components/ResizeImage";
+import Heart from "./components/Heart";
+import CategoryList from "./components/CategoryList";
+import TitleBar from "./components/TitleBar";
+import TitleBarMy from "./components/TitleBarMy";
 
+import {SafeAreaView} from "react-native-safe-area-context";
 
-const {width: SCREEN_WIDTH} = Dimensions.get('window');
+const {width: SCREEN_WIDTH} = Dimensions.get("window");
 
 export default observer(() => {
   const store = useLocalStore(() => new HomeStore());
@@ -37,16 +32,16 @@ export default observer(() => {
     store.requestHomeList();
   };
 
-  const onValueChanged = (value: boolean, item : any) => {
-    console.log("🚀 ~ file: index.tsx:39 ~ onValueChanged ~ item:", item)
-    console.log('输出value', value);
+  const onValueChanged = (value: boolean, item: any) => {
+    console.log("🚀 ~ file: index.tsx:39 ~ onValueChanged ~ item:", item);
+    console.log("输出value", value);
   };
 
   const renderList = ({item, index}: any) => {
-    console.log("🚀 ~ file: index.tsx:44 ~ renderList ~ item:", item)
-    console.log('输出item.avatarUrl', item);
-    console.log("🚀 ~ file: index.tsx:46 ~ renderList ~ item:", item)
-    console.log('输出index', index);
+    console.log("🚀 ~ file: index.tsx:44 ~ renderList ~ item:", item);
+    console.log("输出item.avatarUrl", item);
+    console.log("🚀 ~ file: index.tsx:46 ~ renderList ~ item:", item);
+    console.log("输出index", index);
     return (
       <View style={styles.item}>
         <ResizeImage uri={item.image}></ResizeImage>
@@ -54,7 +49,7 @@ export default observer(() => {
         <View style={styles.nameLayout}>
           <Image style={styles.avatarImg} source={{uri: item.avatarUrl}} />
           <Text style={styles.nameTxt}>{item.userName}</Text>
-          <Heart value={item.isFavorite} onValueChanged={(value) => onValueChanged(value, item)}></Heart>
+          <Heart value={item.isFavorite} onValueChanged={value => onValueChanged(value, item)}></Heart>
           <Text style={styles.countTxt}>{item.favoriteCount}</Text>
         </View>
       </View>
@@ -62,15 +57,17 @@ export default observer(() => {
   };
 
   const FootCOmponent = () => {
-    return (
-      <Text style={styles.footerTxt}>没有更多数据了</Text>
-    )
-  }
+    return <Text style={styles.footerTxt}>没有更多数据了</Text>;
+  };
 
   const handleEndReached = () => {
     store.requestHomeList();
-    console.log('输出');
+    console.log("输出");
   };
+
+  const tabChanged = (value: {title: string, key: number}) => {
+    console.log("🚀 ~ file: index.tsx:69 ~ onTabChanged ~ value:", value)
+  }
 
   useEffect(() => {
     store.requestHomeList();
@@ -79,10 +76,7 @@ export default observer(() => {
   const categoryList = store.categoryList.filter(i => i.isAdd);
   return (
     <View style={styles.root}>
-      <TitleBar                 tab={1}
-                onTabChanged={(tab: number) => {
-                    console.log(`tab=${tab}`)
-                }}></TitleBar>
+      <TitleBarMy tab={1} onTabChanged={tabChanged} ></TitleBarMy>
       <FlowList
         contentContainerStyle={styles.container}
         onEndReached={handleEndReached}
@@ -97,13 +91,13 @@ export default observer(() => {
         ListFooterComponent={FootCOmponent}
         ListHeaderComponent={
           <CategoryList
-              categoryList={categoryList}
-              allCategoryList={store.categoryList}
-              onCategoryChange={(category: Category) => {
-                  console.log(JSON.stringify(category));
-              }}
+            categoryList={categoryList}
+            allCategoryList={store.categoryList}
+            onCategoryChange={(category: Category) => {
+              console.log(JSON.stringify(category));
+            }}
           />
-      }
+        }
       />
     </View>
   );
@@ -111,68 +105,68 @@ export default observer(() => {
 
 const styles = StyleSheet.create({
   root: {
-    width: '100%',
-    height: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f0f0f0',
+    width: "100%",
+    height: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#f0f0f0",
   },
   FlatList: {
-    width: '100%',
-    height: '100%',
+    width: "100%",
+    height: "100%",
   },
   container: {
     // paddingTop: 6,
   },
   item: {
     width: (SCREEN_WIDTH - 18) >> 1,
-    backgroundColor: 'white',
+    backgroundColor: "white",
     marginLeft: 6,
     marginBottom: 6,
     borderRadius: 8,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   titleTxt: {
     fontSize: 14,
-    color: '#333',
+    color: "#333",
     marginHorizontal: 10,
     marginVertical: 4,
   },
   nameLayout: {
-    width: '100%',
-    flexDirection: 'row',
-    alignItems: 'center',
+    width: "100%",
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: 10,
     marginBottom: 10,
   },
   avatarImg: {
     width: 20,
     height: 20,
-    resizeMode: 'cover',
+    resizeMode: "cover",
     borderRadius: 10,
   },
   nameTxt: {
     fontSize: 12,
-    color: '#999',
+    color: "#999",
     marginLeft: 6,
     flex: 1,
   },
   heart: {
     width: 20,
     height: 20,
-    resizeMode: 'contain',
+    resizeMode: "contain",
   },
   countTxt: {
     fontSize: 14,
-    color: '#999',
+    color: "#999",
     marginLeft: 4,
   },
   footerTxt: {
-    width: '100%',
+    width: "100%",
     fontSize: 14,
-    color: '#999',
+    color: "#999",
     marginVertical: 16,
-    textAlign: 'center',
-    textAlignVertical: 'center',
+    textAlign: "center",
+    textAlignVertical: "center",
   },
 });
