@@ -4,7 +4,7 @@
  * @Autor: liushuhao
  * @Date: 2023-11-19 20:51:23
  * @LastEditors: liushuhao
- * @LastEditTime: 2023-12-17 20:55:48
+ * @LastEditTime: 2023-12-25 15:11:32
  */
 import {useLocalStore} from "mobx-react";
 import {observer} from "mobx-react";
@@ -38,10 +38,6 @@ export default observer(() => {
   };
 
   const renderList = ({item, index}: any) => {
-    console.log("🚀 ~ file: index.tsx:44 ~ renderList ~ item:", item);
-    console.log("输出item.avatarUrl", item);
-    console.log("🚀 ~ file: index.tsx:46 ~ renderList ~ item:", item);
-    console.log("输出index", index);
     return (
       <View style={styles.item}>
         <ResizeImage uri={item.image}></ResizeImage>

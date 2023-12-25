@@ -4,7 +4,7 @@
  * @Autor: liushuhao
  * @Date: 2023-11-18 20:26:49
  * @LastEditors: liushuhao
- * @LastEditTime: 2023-12-21 23:07:03
+ * @LastEditTime: 2023-12-25 15:18:58
  */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, {useEffect} from 'react';
@@ -20,7 +20,6 @@ export default () => {
   const navigation = useNavigation<StackNavigationProp<any>>();
 
   useEffect(() => {
-    // clear()
     setTimeout(() => {
       getUserInfo();
     }, 2000);
@@ -28,6 +27,7 @@ export default () => {
 
   const getUserInfo = async () => {
     const cacheUserInfo = await load('userInfo');
+    console.log('输出cacheUserInfo', cacheUserInfo)
     if (cacheUserInfo && JSON.parse(cacheUserInfo)) {
       startHome();
     } else {

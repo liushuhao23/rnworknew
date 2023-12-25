@@ -4,7 +4,7 @@
  * @Autor: liushuhao
  * @Date: 2023-11-18 21:16:57
  * @LastEditors: liushuhao
- * @LastEditTime: 2023-12-21 22:41:42
+ * @LastEditTime: 2023-12-25 15:16:59
  */
 import {request} from '../utils/request';
 import {action, flow, observable} from 'mobx';
@@ -13,27 +13,6 @@ import Loading from '../components/widget/Loading';
 
 class UserStore {
   @observable userInfo: any;
-
-  // requestLogin = async (phone: string, pwd: string, callback: (success: boolean) => void) => {
-  //     try {
-  //         const params = {
-  //             name: phone,
-  //             pwd: pwd,
-  //         };
-  //         const { data } = await request('login', params);
-  //         if (data) {
-  //             this.userInfo = data;
-  //             callback?.(true);
-  //         } else {
-  //             this.userInfo = null;
-  //             callback?.(false);
-  //         }
-  //     } catch (error) {
-  //         console.log(error);
-  //         this.userInfo = null;
-  //         callback?.(false);
-  //     }
-  // };
 
   @action
   setUserInfo = (info: any) => {

@@ -4,51 +4,53 @@
  * @Autor: liushuhao
  * @Date: 2023-11-19 20:51:23
  * @LastEditors: liushuhao
- * @LastEditTime: 2023-12-21 22:43:06
+ * @LastEditTime: 2023-12-25 17:54:04
  */
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {View, Text, StyleSheet, ScrollView, Image, Dimensions, TouchableOpacity, LayoutChangeEvent, RefreshControl} from "react-native";
-import { set } from "mobx";
+import {set} from "mobx";
 
 const WINDOW_DIMENSIONS = Dimensions.get("window");
 
-import icon_mine_bg from '../../assets/icon_mine_bg.png';
-import icon_menu from '../../assets/icon_menu.png';
-import icon_shop_car from '../../assets/icon_shop_car.png';
-import icon_share from '../../assets/icon_share.png';
-import icon_location_info from '../../assets/icon_location_info.png';
-import icon_qrcode from '../../assets/icon_qrcode.png';
-import icon_add from '../../assets/icon_add.png';
-import icon_male from '../../assets/icon_male.png';
-import icon_female from '../../assets/icon_female.png';
-import icon_setting from '../../assets/icon_setting.png';
-import icon_no_note from '../../assets/icon_no_note.webp';
-import icon_no_collection from '../../assets/icon_no_collection.webp';
-import icon_no_favorate from '../../assets/icon_no_favorate.webp';
-import { observer, useLocalStore } from "mobx-react";
+import icon_mine_bg from "../../assets/icon_mine_bg.png";
+import icon_menu from "../../assets/icon_menu.png";
+import icon_shop_car from "../../assets/icon_shop_car.png";
+import icon_share from "../../assets/icon_share.png";
+import icon_location_info from "../../assets/icon_location_info.png";
+import icon_qrcode from "../../assets/icon_qrcode.png";
+import icon_add from "../../assets/icon_add.png";
+import icon_male from "../../assets/icon_male.png";
+import icon_female from "../../assets/icon_female.png";
+import icon_setting from "../../assets/icon_setting.png";
+import icon_no_note from "../../assets/icon_no_note.webp";
+import icon_no_collection from "../../assets/icon_no_collection.webp";
+import icon_no_favorate from "../../assets/icon_no_favorate.webp";
+import {observer, useLocalStore} from "mobx-react";
 import MineStore from "./MineStore";
-import UserStore from "../../stores/UserStore";
-
+import {load} from "../../utils/Storage";
+interface SideMenuRef {
+  show: () => void;
+  hide: () => void;
+}
 
 export default observer(() => {
-  const [bgImgHeight, setBgImgHeight] = useState<number>(400);
+  const [bgImgHeight, setBgImgHeight] = useState<number>(300);
   const [activeTab, setActiveTab] = useState<string>("note");
+  const [useInfo, setUseInfo] = useState<any>({});
+  const sideMenuRef = useRef<SideMenuRef>(null);
 
   const store = useLocalStore(() => new MineStore());
-
-
-  const {userInfo} = UserStore;
-  console.log("🚀 ~ file: index.tsx:41 ~ observer ~ userInfo:", userInfo)
-
-
+  console.log("🚀 ~ file: index.tsx:38 ~ observer ~ store:", store)
   // const navigation = useNavigation<StackNavigationProp<any>>();
-
   useEffect(() => {
     store.requestAll();
+    load("userInfo").then(cacheUserInfo => {
+      const userInfo = JSON.parse(cacheUserInfo!);
+      setUseInfo(userInfo);
+    });
   }, []);
 
   const renderTitleBar = () => {
-
     const styles = StyleSheet.create({
       content: {
         width: "100%",
@@ -72,11 +74,11 @@ export default observer(() => {
         marginHorizontal: 20,
       },
       checkedTitle: {
-        color: '#333',
+        color: "#333",
         marginHorizontal: 20,
 
         fontSize: 18,
-      }
+      },
     });
     const barList = [
       {
@@ -92,199 +94,197 @@ export default observer(() => {
         key: "Like",
       },
     ];
-
-  
-    const changeTab = (item: {title: string, key: string}) => {
-      console.log("🚀 ~ file: index.tsx:55 ~ changeTab ~ item:", item)
-      setActiveTab(item.key)
-    }
+    const changeTab = (item: {title: string; key: string}) => {
+      console.log("🚀 ~ file: index.tsx:55 ~ changeTab ~ item:", item);
+      setActiveTab(item.key);
+    };
     return (
       <View style={styles.content}>
-        <View style={styles.barContent}> 
-        {barList.map((item, index) => {
-          return (
-            <TouchableOpacity  onPress={() => changeTab(item)}>
-              <View key={index}>
-                <Text style={activeTab === item.key ? styles.checkedTitle : styles.title}>{item.title}</Text>
-              </View>
-            </TouchableOpacity>
-          );
-        })}
+        <View style={styles.barContent}>
+          {barList.map((item, index) => {
+            return (
+              <TouchableOpacity key={index} onPress={() => changeTab(item)}>
+                <View>
+                  <Text style={activeTab === item.key ? styles.checkedTitle : styles.title}>{item.title}</Text>
+                </View>
+              </TouchableOpacity>
+            );
+          })}
         </View>
-  
       </View>
     );
   };
   const renderTitle = () => {
     const styles = StyleSheet.create({
       titleLayout: {
-        width: '100%',
+        width: "100%",
         height: 48,
-        flexDirection: 'row',
-        alignItems: 'center',
+        flexDirection: "row",
+        alignItems: "center",
       },
       menuButton: {
-        height: '100%',
+        height: "100%",
         paddingHorizontal: 16,
-        justifyContent: 'center',
+        justifyContent: "center",
       },
       icon_menu: {
         width: 28,
         height: 28,
-        resizeMode: 'contain',
+        resizeMode: "contain",
       },
       menuImg: {
         width: 28,
         height: 28,
-        resizeMode: 'contain',
+        resizeMode: "contain",
       },
       rightMenuImg: {
         marginHorizontal: 12,
-        tintColor: 'white',
+        tintColor: "white",
       },
-    })
+    });
+
+    const openMenu = () => {
+      
+    }
     return (
       <View style={styles.titleLayout}>
-        <TouchableOpacity  style={styles.menuButton}>
+        <TouchableOpacity style={styles.menuButton} onPress={openMenu}>
           <Image source={icon_menu} style={styles.icon_menu}></Image>
         </TouchableOpacity>
         <View style={{flex: 1}}></View>
         <Image source={icon_shop_car} style={[styles.menuImg, styles.rightMenuImg]}></Image>
         <Image source={icon_share} style={[styles.menuImg, styles.rightMenuImg]}></Image>
       </View>
-    )
-  }
+    );
+  };
 
   const renderInfo = () => {
-    const {avatar, nickName, redBookId, desc, sex} = userInfo;
-    console.log('输出avatar', avatar )
     const styles = StyleSheet.create({
       avatarLayout: {
-        width: '100%',
-        flexDirection: 'row',
-        alignItems: 'flex-end',
+        width: "100%",
+        flexDirection: "row",
+        alignItems: "flex-end",
         padding: 16,
+        left: -20,
       },
       avatarImg: {
         width: 96,
         height: 96,
-        resizeMode: 'cover',
+        resizeMode: "cover",
         borderRadius: 48,
+        left: 20
       },
       addImg: {
         width: 28,
         height: 28,
-        marginLeft: -28,
-        marginBottom: 2,
+        // left: 90,
+        // top: -25
       },
       nameLayout: {
         marginLeft: 20,
+
       },
       nameTxt: {
         fontSize: 22,
-        color: 'white',
-        fontWeight: 'bold',
+        color: "white",
+        fontWeight: "bold",
       },
       idLayout: {
-        flexDirection: 'row',
-        alignItems: 'center',
+        flexDirection: "row",
+        alignItems: "center",
         marginTop: 16,
         marginBottom: 20,
       },
       idTxt: {
         fontSize: 12,
-        color: '#bbb',
+        color: "#bbb",
       },
       qrcodeImg: {
         width: 12,
         height: 12,
         marginLeft: 6,
-        tintColor: '#bbb',
+        tintColor: "#bbb",
       },
       descTxt: {
         fontSize: 14,
-        color: 'white',
+        color: "white",
         paddingHorizontal: 16,
       },
       sexLayout: {
         width: 32,
         height: 24,
-        backgroundColor: '#ffffff50',
+        backgroundColor: "#ffffff50",
         borderRadius: 12,
         marginTop: 12,
         marginLeft: 16,
-        justifyContent: 'center',
-        alignItems: 'center',
+        justifyContent: "center",
+        alignItems: "center",
       },
       sexImg: {
         width: 12,
         height: 12,
-        resizeMode: 'contain',
+        resizeMode: "contain",
       },
       infoLayout: {
-        width: '100%',
+        width: "100%",
         paddingRight: 16,
-        flexDirection: 'row',
-        alignItems: 'center',
+        flexDirection: "row",
+        alignItems: "center",
         marginTop: 20,
         marginBottom: 28,
       },
       infoItem: {
-        alignItems: 'center',
+        alignItems: "center",
         paddingHorizontal: 16,
       },
       infoValue: {
         fontSize: 18,
-        color: 'white',
+        color: "white",
       },
       infoLabel: {
         fontSize: 12,
-        color: '#ddd',
+        color: "#ddd",
         marginTop: 6,
       },
       infoButton: {
         height: 32,
         paddingHorizontal: 16,
         borderWidth: 1,
-        borderColor: 'white',
+        borderColor: "white",
         borderRadius: 16,
-        justifyContent: 'center',
-        alignItems: 'center',
+        justifyContent: "center",
+        alignItems: "center",
         marginLeft: 16,
       },
       editTxt: {
         fontSize: 14,
-        color: '#ffffff',
+        color: "#ffffff",
       },
       settingImg: {
         width: 20,
         height: 20,
-        tintColor: '#ffffff',
+        tintColor: "#ffffff",
       },
     });
-    const {info} = store;
+    const { info } = store;
     return (
-      <View
-        onLayout={(e: LayoutChangeEvent) => {
-          const {height} = e.nativeEvent.layout;
-          setBgImgHeight(height);
-        }}>
+      <View style={{position: 'absolute', top: 40}}>
         <View style={styles.avatarLayout}>
-          <Image style={styles.avatarImg} source={{uri: avatar}} />
+          <Image style={styles.avatarImg} source={{uri: useInfo.avatar}} />
           <Image style={styles.addImg} source={icon_add} />
           <View style={styles.nameLayout}>
-            <Text style={styles.nameTxt}>{nickName}</Text>
+            <Text style={styles.nameTxt}>{useInfo.nickName}</Text>
             <View style={styles.idLayout}>
-              <Text style={styles.idTxt}>小红书号：{redBookId}</Text>
+              <Text style={styles.idTxt}>小红书号：{useInfo.redBookId}</Text>
               <Image style={styles.qrcodeImg} source={icon_qrcode} />
             </View>
           </View>
         </View>
-        <Text style={styles.descTxt}>{desc}</Text>
+        <Text style={styles.descTxt}>{useInfo.desc}</Text>
         <View style={styles.sexLayout}>
           <Image
             style={styles.sexImg}
-            source={sex === 'male' ? icon_male : icon_female}
+            source={useInfo.sex === 'male' ? icon_male : icon_female}
           />
         </View>
         <View style={styles.infoLayout}>
@@ -310,8 +310,57 @@ export default observer(() => {
             <Image style={styles.settingImg} source={icon_setting} />
           </TouchableOpacity>
         </View>
-      </View>
+        </View>
     );
+    // return (
+    //   <View
+    //     onLayout={(e: LayoutChangeEvent) => {
+    //       const {height} = e.nativeEvent.layout;
+    //       setBgImgHeight(height);
+    //     }}>
+        // <View style={styles.avatarLayout}>
+        //   <Image style={styles.avatarImg} source={{uri: avatar}} />
+        //   <Image style={styles.addImg} source={icon_add} />
+        //   <View style={styles.nameLayout}>
+        //     <Text style={styles.nameTxt}>{nickName}</Text>
+        //     <View style={styles.idLayout}>
+        //       <Text style={styles.idTxt}>小红书号：{redBookId}</Text>
+        //       <Image style={styles.qrcodeImg} source={icon_qrcode} />
+        //     </View>
+        //   </View>
+        // </View>
+    //     <Text style={styles.descTxt}>{desc}</Text>
+        // <View style={styles.sexLayout}>
+        //   <Image
+        //     style={styles.sexImg}
+        //     source={sex === 'male' ? icon_male : icon_female}
+        //   />
+        // </View>
+        // <View style={styles.infoLayout}>
+        //   <View style={styles.infoItem}>
+        //     <Text style={styles.infoValue}>{info.followCount}</Text>
+        //     <Text style={styles.infoLabel}>关注</Text>
+        //   </View>
+        //   <View style={styles.infoItem}>
+        //     <Text style={styles.infoValue}>{info.fans}</Text>
+        //     <Text style={styles.infoLabel}>粉丝</Text>
+        //   </View>
+        //   <View style={styles.infoItem}>
+        //     <Text style={styles.infoValue}>{info.favorateCount}</Text>
+        //     <Text style={styles.infoLabel}>获赞与收藏</Text>
+        //   </View>
+
+        //   <View style={{flex: 1}} />
+
+        //   <TouchableOpacity style={styles.infoButton}>
+        //     <Text style={styles.editTxt}>编辑资料</Text>
+        //   </TouchableOpacity>
+        //   <TouchableOpacity style={styles.infoButton}>
+        //     <Image style={styles.settingImg} source={icon_setting} />
+        //   </TouchableOpacity>
+        // </View>
+    //   </View>
+    // );
   };
 
   useEffect(() => {
@@ -321,22 +370,13 @@ export default observer(() => {
     <View>
       <View style={styles.root}>
         <Image style={[styles.bgImg, {height: bgImgHeight + 64}]} source={icon_mine_bg} />
-        {
-          renderTitle()
-        }
-      </View>
-      <View style={styles.persionsInfo}></View>
-        {renderTitleBar()} 
+        {renderTitle()}
         {renderInfo()}
-      <ScrollView
-        style={styles.scrollView}
-        refreshControl={
-          <RefreshControl
-            refreshing={store.refreshing}
-            onRefresh={store.requestAll}
-          />
-        }>
-        {/* {renderInfo()} */}
+      </View>
+      <View style={styles.persionsInfo}>
+      </View>
+      {renderTitleBar()}
+      <ScrollView style={styles.scrollView} refreshControl={<RefreshControl refreshing={store.refreshing} onRefresh={store.requestAll} />}>
       </ScrollView>
       {/* <ScrollView style={styles.article}>
         <Text style={styles.text}>
@@ -353,8 +393,6 @@ export default observer(() => {
 const styles = StyleSheet.create({
   root: {
     width: "100%",
-    // height: '100%',
-    // backgroundColor: 'red',
   },
   bgImg: {
     position: "absolute",
@@ -365,7 +403,6 @@ const styles = StyleSheet.create({
   persionsInfo: {
     width: "100%",
     height: 300,
-    // borderBottomWidth: 1,
   },
   article: {
     width: "100%",
@@ -376,7 +413,7 @@ const styles = StyleSheet.create({
     fontSize: 32,
   },
   scrollView: {
-    width: '100%',
+    width: "100%",
     flex: 1,
   },
 });
