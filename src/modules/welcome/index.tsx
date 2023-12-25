@@ -4,7 +4,7 @@
  * @Autor: liushuhao
  * @Date: 2023-11-18 20:26:49
  * @LastEditors: liushuhao
- * @LastEditTime: 2023-12-10 21:15:15
+ * @LastEditTime: 2023-12-21 23:07:03
  */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, {useEffect} from 'react';
@@ -14,12 +14,13 @@ import {StackNavigationProp} from '@react-navigation/stack';
 // import {load} from '../../utils/Storage';
 
 import icon_logo_main from '../../assets/icon_main_logo.png';
-import {load} from '../../utils/Storage';
+import {clear, load} from '../../utils/Storage';
 
 export default () => {
   const navigation = useNavigation<StackNavigationProp<any>>();
 
   useEffect(() => {
+    // clear()
     setTimeout(() => {
       getUserInfo();
     }, 2000);
