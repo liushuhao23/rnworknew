@@ -4,9 +4,9 @@
  * @Autor: liushuhao
  * @Date: 2023-11-19 20:51:23
  * @LastEditors: liushuhao
- * @LastEditTime: 2023-12-25 17:54:04
+ * @LastEditTime: 2023-12-26 15:40:26
  */
-import React, {useEffect, useRef, useState} from "react";
+import React, {useCallback, useEffect, useRef, useState} from "react";
 import {View, Text, StyleSheet, ScrollView, Image, Dimensions, TouchableOpacity, LayoutChangeEvent, RefreshControl} from "react-native";
 import {set} from "mobx";
 
@@ -26,21 +26,41 @@ import icon_no_note from "../../assets/icon_no_note.webp";
 import icon_no_collection from "../../assets/icon_no_collection.webp";
 import icon_no_favorate from "../../assets/icon_no_favorate.webp";
 import {observer, useLocalStore} from "mobx-react";
+import Empty from "../../components/Empty";
+import Heart from "../../components/Heart";
 import MineStore from "./MineStore";
 import {load} from "../../utils/Storage";
+import SideMenu from "./SideMenu";
+import {useNavigation} from "@react-navigation/native";
+import {StackNavigationProp} from "@react-navigation/stack";
 interface SideMenuRef {
   show: () => void;
   hide: () => void;
 }
+
+const {width: SCREEN_WIDTH} = Dimensions.get("window");
+
+const EMPTY_CONFIG = [
+  {icon: icon_no_note, tips: "快去发布今日的好心情吧～"},
+  {icon: icon_no_collection, tips: "快去收藏你喜欢的作品吧～"},
+  {icon: icon_no_favorate, tips: "喜欢点赞的人运气不会太差哦～"},
+];
 
 export default observer(() => {
   const [bgImgHeight, setBgImgHeight] = useState<number>(300);
   const [activeTab, setActiveTab] = useState<string>("note");
   const [useInfo, setUseInfo] = useState<any>({});
   const sideMenuRef = useRef<SideMenuRef>(null);
+  const [tabIndex, setTabIndex] = useState<number>(0);
 
   const store = useLocalStore(() => new MineStore());
-  console.log("🚀 ~ file: index.tsx:38 ~ observer ~ store:", store)
+  const navigation = useNavigation<StackNavigationProp<any>>();
+  const onArticlePress = useCallback(
+    (article: ArticleSimple) => () => {
+      navigation.push("ArticleDetail", {id: article.id});
+    },
+    [],
+  );
   // const navigation = useNavigation<StackNavigationProp<any>>();
   useEffect(() => {
     store.requestAll();
@@ -84,19 +104,22 @@ export default observer(() => {
       {
         title: "笔记",
         key: "note",
+        index: 0
       },
       {
         title: "收藏",
         key: "collect",
+        index: 1
       },
       {
         title: "赞过",
         key: "Like",
+        index: 2
       },
     ];
-    const changeTab = (item: {title: string; key: string}) => {
-      console.log("🚀 ~ file: index.tsx:55 ~ changeTab ~ item:", item);
+    const changeTab = (item: {title: string; key: string, index: number}) => {
       setActiveTab(item.key);
+      setTabIndex(item.index);
     };
     return (
       <View style={styles.content}>
@@ -144,8 +167,8 @@ export default observer(() => {
     });
 
     const openMenu = () => {
-      
-    }
+      sideMenuRef.current?.show();
+    };
     return (
       <View style={styles.titleLayout}>
         <TouchableOpacity style={styles.menuButton} onPress={openMenu}>
@@ -172,7 +195,7 @@ export default observer(() => {
         height: 96,
         resizeMode: "cover",
         borderRadius: 48,
-        left: 20
+        left: 20,
       },
       addImg: {
         width: 28,
@@ -182,7 +205,6 @@ export default observer(() => {
       },
       nameLayout: {
         marginLeft: 20,
-
       },
       nameTxt: {
         fontSize: 22,
@@ -266,9 +288,9 @@ export default observer(() => {
         tintColor: "#ffffff",
       },
     });
-    const { info } = store;
+    const {info} = store;
     return (
-      <View style={{position: 'absolute', top: 40}}>
+      <View style={{position: "absolute", top: 40}}>
         <View style={styles.avatarLayout}>
           <Image style={styles.avatarImg} source={{uri: useInfo.avatar}} />
           <Image style={styles.addImg} source={icon_add} />
@@ -282,10 +304,7 @@ export default observer(() => {
         </View>
         <Text style={styles.descTxt}>{useInfo.desc}</Text>
         <View style={styles.sexLayout}>
-          <Image
-            style={styles.sexImg}
-            source={useInfo.sex === 'male' ? icon_male : icon_female}
-          />
+          <Image style={styles.sexImg} source={useInfo.sex === "male" ? icon_male : icon_female} />
         </View>
         <View style={styles.infoLayout}>
           <View style={styles.infoItem}>
@@ -310,7 +329,7 @@ export default observer(() => {
             <Image style={styles.settingImg} source={icon_setting} />
           </TouchableOpacity>
         </View>
-        </View>
+      </View>
     );
     // return (
     //   <View
@@ -318,53 +337,145 @@ export default observer(() => {
     //       const {height} = e.nativeEvent.layout;
     //       setBgImgHeight(height);
     //     }}>
-        // <View style={styles.avatarLayout}>
-        //   <Image style={styles.avatarImg} source={{uri: avatar}} />
-        //   <Image style={styles.addImg} source={icon_add} />
-        //   <View style={styles.nameLayout}>
-        //     <Text style={styles.nameTxt}>{nickName}</Text>
-        //     <View style={styles.idLayout}>
-        //       <Text style={styles.idTxt}>小红书号：{redBookId}</Text>
-        //       <Image style={styles.qrcodeImg} source={icon_qrcode} />
-        //     </View>
-        //   </View>
-        // </View>
+    // <View style={styles.avatarLayout}>
+    //   <Image style={styles.avatarImg} source={{uri: avatar}} />
+    //   <Image style={styles.addImg} source={icon_add} />
+    //   <View style={styles.nameLayout}>
+    //     <Text style={styles.nameTxt}>{nickName}</Text>
+    //     <View style={styles.idLayout}>
+    //       <Text style={styles.idTxt}>小红书号：{redBookId}</Text>
+    //       <Image style={styles.qrcodeImg} source={icon_qrcode} />
+    //     </View>
+    //   </View>
+    // </View>
     //     <Text style={styles.descTxt}>{desc}</Text>
-        // <View style={styles.sexLayout}>
-        //   <Image
-        //     style={styles.sexImg}
-        //     source={sex === 'male' ? icon_male : icon_female}
-        //   />
-        // </View>
-        // <View style={styles.infoLayout}>
-        //   <View style={styles.infoItem}>
-        //     <Text style={styles.infoValue}>{info.followCount}</Text>
-        //     <Text style={styles.infoLabel}>关注</Text>
-        //   </View>
-        //   <View style={styles.infoItem}>
-        //     <Text style={styles.infoValue}>{info.fans}</Text>
-        //     <Text style={styles.infoLabel}>粉丝</Text>
-        //   </View>
-        //   <View style={styles.infoItem}>
-        //     <Text style={styles.infoValue}>{info.favorateCount}</Text>
-        //     <Text style={styles.infoLabel}>获赞与收藏</Text>
-        //   </View>
+    // <View style={styles.sexLayout}>
+    //   <Image
+    //     style={styles.sexImg}
+    //     source={sex === 'male' ? icon_male : icon_female}
+    //   />
+    // </View>
+    // <View style={styles.infoLayout}>
+    //   <View style={styles.infoItem}>
+    //     <Text style={styles.infoValue}>{info.followCount}</Text>
+    //     <Text style={styles.infoLabel}>关注</Text>
+    //   </View>
+    //   <View style={styles.infoItem}>
+    //     <Text style={styles.infoValue}>{info.fans}</Text>
+    //     <Text style={styles.infoLabel}>粉丝</Text>
+    //   </View>
+    //   <View style={styles.infoItem}>
+    //     <Text style={styles.infoValue}>{info.favorateCount}</Text>
+    //     <Text style={styles.infoLabel}>获赞与收藏</Text>
+    //   </View>
 
-        //   <View style={{flex: 1}} />
+    //   <View style={{flex: 1}} />
 
-        //   <TouchableOpacity style={styles.infoButton}>
-        //     <Text style={styles.editTxt}>编辑资料</Text>
-        //   </TouchableOpacity>
-        //   <TouchableOpacity style={styles.infoButton}>
-        //     <Image style={styles.settingImg} source={icon_setting} />
-        //   </TouchableOpacity>
-        // </View>
+    //   <TouchableOpacity style={styles.infoButton}>
+    //     <Text style={styles.editTxt}>编辑资料</Text>
+    //   </TouchableOpacity>
+    //   <TouchableOpacity style={styles.infoButton}>
+    //     <Image style={styles.settingImg} source={icon_setting} />
+    //   </TouchableOpacity>
+    // </View>
     //   </View>
     // );
   };
 
+  const renderList = () => {
+    const {noteList, collectionList, favorateList} = store;
+    console.log("🚀 ~ file: index.tsx:389 ~ renderList ~ favorateList:", favorateList);
+    // console.log("🚀 ~ file: index.tsx:389 ~ renderList ~ collectionList:", collectionList);
+    // console.log("🚀 ~ file: index.tsx:389 ~ renderList ~ noteList:", noteList);
+    const currentList = [noteList, collectionList, favorateList][tabIndex];
+    console.log("🚀 ~ file: index.tsx:390 ~ renderList ~ currentList:", currentList);
+    if (!currentList?.length) {
+      const config = EMPTY_CONFIG[tabIndex];
+      return <Empty icon={config.icon} tips={config.tips} />;
+    }
+    const styles = StyleSheet.create({
+      listContainer: {
+        width: "100%",
+        flexDirection: "row",
+        flexWrap: "wrap",
+        backgroundColor: "white",
+      },
+      item: {
+        width: (SCREEN_WIDTH - 18) >> 1,
+        backgroundColor: "white",
+        marginLeft: 6,
+        marginBottom: 6,
+        borderRadius: 8,
+        overflow: "hidden",
+        marginTop: 8,
+      },
+      titleTxt: {
+        fontSize: 14,
+        color: "#333",
+        marginHorizontal: 10,
+        marginVertical: 4,
+      },
+      nameLayout: {
+        width: "100%",
+        flexDirection: "row",
+        alignItems: "center",
+        paddingHorizontal: 10,
+        marginBottom: 10,
+      },
+      avatarImg: {
+        width: 20,
+        height: 20,
+        resizeMode: "cover",
+        borderRadius: 10,
+      },
+      nameTxt: {
+        fontSize: 12,
+        color: "#999",
+        marginLeft: 6,
+        flex: 1,
+      },
+      heart: {
+        width: 20,
+        height: 20,
+        resizeMode: "contain",
+      },
+      countTxt: {
+        fontSize: 14,
+        color: "#999",
+        marginLeft: 4,
+      },
+      itemImg: {
+        width: (SCREEN_WIDTH - 18) >> 1,
+        height: 240,
+      },
+    });
+    return (
+      <View style={styles.listContainer}>
+        {currentList.map((item, index) => {
+          return (
+            <TouchableOpacity key={`${item.id}-${index}`} style={styles.item} onPress={onArticlePress(item)}>
+              <Image style={styles.itemImg} source={{uri: item.image}} />
+              <Text style={styles.titleTxt}>{item.title}</Text>
+              <View style={styles.nameLayout}>
+                <Image style={styles.avatarImg} source={{uri: item.avatarUrl}} />
+                <Text style={styles.nameTxt}>{item.userName}</Text>
+                <Heart
+                  value={item.isFavorite}
+                  onValueChanged={(value: boolean) => {
+                    console.log(value);
+                  }}
+                />
+                <Text style={styles.countTxt}>{item.favoriteCount}</Text>
+              </View>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+    );
+  };
+
   useEffect(() => {
-    console.log("🚀 ~ file: index.tsx:14 ~ WINDOW_DIMENSIONS:", WINDOW_DIMENSIONS);
+    //
   }, []);
   return (
     <View>
@@ -373,10 +484,10 @@ export default observer(() => {
         {renderTitle()}
         {renderInfo()}
       </View>
-      <View style={styles.persionsInfo}>
-      </View>
+      <View style={styles.persionsInfo}></View>
       {renderTitleBar()}
-      <ScrollView style={styles.scrollView} refreshControl={<RefreshControl refreshing={store.refreshing} onRefresh={store.requestAll} />}>
+      <ScrollView style={styles.article} refreshControl={<RefreshControl refreshing={store.refreshing} onRefresh={store.requestAll} />}>
+        {renderList()}
       </ScrollView>
       {/* <ScrollView style={styles.article}>
         <Text style={styles.text}>
@@ -386,6 +497,7 @@ export default observer(() => {
           aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor
         </Text>
       </ScrollView> */}
+      <SideMenu ref={sideMenuRef}></SideMenu>
     </View>
   );
 });
@@ -407,7 +519,7 @@ const styles = StyleSheet.create({
   article: {
     width: "100%",
     backgroundColor: "white",
-    height: WINDOW_DIMENSIONS.height - 275,
+    height: WINDOW_DIMENSIONS.height - 555,
   },
   text: {
     fontSize: 32,
