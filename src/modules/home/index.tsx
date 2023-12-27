@@ -4,13 +4,14 @@
  * @Autor: liushuhao
  * @Date: 2023-11-19 20:51:23
  * @LastEditors: liushuhao
- * @LastEditTime: 2023-12-25 15:11:32
+ * @LastEditTime: 2023-12-27 13:38:00
  */
 import {useLocalStore} from "mobx-react";
 import {observer} from "mobx-react";
 import React, {useEffect} from "react";
-import {View, Text, FlatList, StyleSheet, Dimensions, Image} from "react-native";
+import {View, Text, FlatList, StyleSheet, Dimensions, Image, TouchableOpacity} from "react-native";
 import HomeStore from "../../stores/HomeStore";
+import { useNavigation } from '@react-navigation/native';
 import icon_heart from "../../assets/icon_heart.png";
 import icon_heart_empty from "../../assets/icon_heart_empty.png";
 import FlowList from "../../components/flowlist/FlowList.js";
@@ -19,13 +20,14 @@ import Heart from "./components/Heart";
 import CategoryList from "./components/CategoryList";
 import TitleBar from "./components/TitleBar";
 import TitleBarMy from "./components/TitleBarMy";
+import { StackNavigationProp } from "@react-navigation/stack";
 
-import {SafeAreaView} from "react-native-safe-area-context";
 
 const {width: SCREEN_WIDTH} = Dimensions.get("window");
 
 export default observer(() => {
   const store = useLocalStore(() => new HomeStore());
+  const navigation = useNavigation<StackNavigationProp<any>>();
 
   const refreshNewData = () => {
     store.resetPage();
@@ -38,8 +40,15 @@ export default observer(() => {
   };
 
   const renderList = ({item, index}: any) => {
+    const  onArticlePress = (item: any) => {
+      console.log("🚀 ~ file: index.tsx:44 ~ onArticlePress ~ item:", item)
+      navigation.push("ArticleDetail", {id: item.id})
+    }
     return (
-      <View style={styles.item}>
+      <TouchableOpacity
+        style={styles.item}
+        onPress={() =>onArticlePress(item)}
+      >
         <ResizeImage uri={item.image}></ResizeImage>
         <Text style={styles.titleTxt}>{item.title}</Text>
         <View style={styles.nameLayout}>
@@ -48,7 +57,7 @@ export default observer(() => {
           <Heart value={item.isFavorite} onValueChanged={value => onValueChanged(value, item)}></Heart>
           <Text style={styles.countTxt}>{item.favoriteCount}</Text>
         </View>
-      </View>
+      </TouchableOpacity>
     );
   };
 

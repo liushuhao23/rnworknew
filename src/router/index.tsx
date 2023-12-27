@@ -4,7 +4,7 @@
  * @Autor: liushuhao
  * @Date: 2023-11-19 19:37:14
  * @LastEditors: liushuhao
- * @LastEditTime: 2023-12-17 20:20:07
+ * @LastEditTime: 2023-12-27 13:42:18
  */
 import React, {FC} from "react";
 import {NavigationContainer} from "@react-navigation/native";
@@ -12,14 +12,11 @@ import login from "../../src/modules/login/index";
 import welcome from "../../src/modules/welcome/index";
 import MainTab from "../../src/modules/MainTab";
 import {createStackNavigator, TransitionPresets} from "@react-navigation/stack";
-import { SafeAreaView } from "react-native-safe-area-context";
-// import {View} from 'react-native';
+import ArticleDetail from "../modules/articleDetail/ArticleDetail";
 
-// const BottomTab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 const Index: FC = () => {
   return (
-    // <SafeAreaView>
       <NavigationContainer>
         <Stack.Navigator
           initialRouteName="Welcome"
@@ -49,9 +46,16 @@ const Index: FC = () => {
               ...TransitionPresets.SlideFromRightIOS,
             }}
           />
+          <Stack.Screen
+            name="ArticleDetail"
+            component={ArticleDetail}
+            options={{
+              headerShown: false,
+              ...TransitionPresets.SlideFromRightIOS,
+            }}
+          />
         </Stack.Navigator>
       </NavigationContainer>
-    // </SafeAreaView>
   );
 };
 export default Index;

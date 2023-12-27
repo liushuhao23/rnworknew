@@ -4,7 +4,7 @@
  * @Autor: liushuhao
  * @Date: 2023-12-25 17:55:20
  * @LastEditors: liushuhao
- * @LastEditTime: 2023-12-26 15:23:18
+ * @LastEditTime: 2023-12-27 09:34:15
  */
 import React, {FC, forwardRef, useCallback, useImperativeHandle, useState} from "react";
 import {Modal, View, Text, StyleSheet, Image, TouchableOpacity, Dimensions, ScrollView, LayoutAnimation} from "react-native";
@@ -130,7 +130,6 @@ const Index = forwardRef((props: any, ref) => {
   };
 
   const hide = () => {
-    console.log('输出jsjjsjsjsjjj')
     LayoutAnimation.easeInEaseOut();
     setOpen(false);
     setTimeout(() => {
